@@ -3,11 +3,13 @@ import requests
 from lxml import etree
 
 from db_manager import DBManager
+from constant_manager import ConstantsManager
 
 
 class ResponseParser(object):
     def __init__(self):
         self.dbMandger = DBManager()
+        self.constantsUtil = ConstantsManager()
 
     # 解析当前版本号
     def parseVersion(self, url):
@@ -60,8 +62,25 @@ class ResponseParser(object):
         response = bytes(bytearray(response, encoding='utf-8'))
         root = etree.XML(response)
 
-        pd_line_version = root.xpath('/modify/pd_line/@version')[0]
-        px_line_version = root.xpath('/modify/px_line/@version')[0]
+        pd_line_version = int(str(root.xpath('/modify/pd_line/@version')[0]))
+        px_line_version = int(str(root.xpath('/modify/px_line/@version')[0]))
         pd_line_url = root.xpath('/modify/pd_line/@url')[0]
         px_line_url = root.xpath('/modify/px_line/@url')[0]
 
+        # 浦西
+        current_px_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PX)
+        if current_px_version != px_line_version:
+            print '浦西线路更新'
+            print current_px_version
+            print px_line_version
+            self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PX, px_line_version)
+
+            # todo 插入新的路线
+
+        # 浦东
+        current_pd_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PD)
+        if current_pd_version != pd_line_version:
+            self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PD, pd_line_version)
+            print '浦东线路更新'
+
+            # todo 插入新的线路

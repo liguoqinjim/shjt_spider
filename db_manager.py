@@ -28,3 +28,19 @@ class DBManager(object):
 
         return result
 
+    # 得到线路的版本
+    def getCurrentLineVersion(self, line_type):
+        sql = 'select * from t_line_version where line_type = %d order by id desc limit 1' % line_type
+        result = self.db.get(sql)
+
+        if result == None:
+            return 0
+
+        return result['line_version']
+
+    def insertLineVersion(self, line_type, line_version):
+        sql = 'insert into t_line_version(line_type,line_version,version_time) values(%d,%d,%d)' % (
+            line_type, line_version, time.time())
+        result = self.db.insert(sql)
+
+        return result
