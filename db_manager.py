@@ -18,6 +18,8 @@ class DBManager(object):
     def getCurrentVersion(self):
         sql = 'select * from t_version order by id desc limit 1'
         result = self.db.get(sql)
+        if result == None:
+            return 0
         # print result['version']
         return result['version']
 
@@ -38,9 +40,19 @@ class DBManager(object):
 
         return result['line_version']
 
+    # 插入线路的版本
     def insertLineVersion(self, line_type, line_version):
         sql = 'insert into t_line_version(line_type,line_version,version_time) values(%d,%d,%d)' % (
             line_type, line_version, time.time())
+        result = self.db.insert(sql)
+
+        return result
+
+    # 插入线路
+    def insertLine(self, line_version, line_type, line_name, line_actual):
+        sql = "insert into t_line(line_version,line_type,line_name,line_actual,line_time) values(%d,%d,'%s','%s',%d)" % (
+            line_version, line_type, line_name, line_actual, time.time())
+
         result = self.db.insert(sql)
 
         return result

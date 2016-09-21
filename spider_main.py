@@ -11,15 +11,16 @@ class SpiderMain(object):
         self.parser = response_parser.ResponseParser()
         self.constants = constant_manager.ConstantsManager()
 
+
 if __name__ == '__main__':
     spiderMain = SpiderMain()
 
-    #app_version
+    # app_version
     app_version = spiderMain.parser.parseVersion(spiderMain.url_version)
     spiderMain.constants.app_version = app_version
 
-    #app_modify
+    # app_modify
     spiderMain.parser.parserModify(spiderMain.url_modify)
 
-
-
+    # test_line
+    # spiderMain.parser.parseLine(21, 1, 'http://www.jt.sh.cn/trafficWeb/lbs/px.xml')

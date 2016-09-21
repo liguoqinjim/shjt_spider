@@ -28,7 +28,7 @@ class ResponseParser(object):
         # print response
         root = etree.XML(response)
 
-        version = root.xpath('/update/version/text()')[0]
+        version = int(str(root.xpath('/update/version/text()')[0]))
         apk_url = root.xpath('/update/apk/text()')[0]
 
         current_version = self.dbMandger.getCurrentVersion()
@@ -69,18 +69,48 @@ class ResponseParser(object):
 
         # 浦西
         current_px_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PX)
+        self.constantsUtil.px_line_version = px_line_version
         if current_px_version != px_line_version:
             print '浦西线路更新'
-            print current_px_version
-            print px_line_version
+
+            self.constantsUtil.px_line_version = px_line_version
+
             self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PX, px_line_version)
 
-            # todo 插入新的路线
+            # 插入新的路线
+            self.parseLine(px_line_version, self.constantsUtil.LINE_TYPE_PX, px_line_url)
+
+            print '浦西线路更新完成'
 
         # 浦东
         current_pd_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PD)
+        self.constantsUtil.pd_line_version = current_pd_version
         if current_pd_version != pd_line_version:
-            self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PD, pd_line_version)
             print '浦东线路更新'
+            print pd_line_url
+            self.constantsUtil.pd_line_version = pd_line_version
 
-            # todo 插入新的线路
+            self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PD, pd_line_version)
+
+            # 插入新的线路
+            self.parseLine(pd_line_version, self.constantsUtil.LINE_TYPE_PD, pd_line_url)
+            print '浦东线路更新完成'
+
+    def parseLine(self, line_version, line_type, url):
+        response = requests.get(url).content
+
+        root = etree.XML(response)
+
+        '''
+            <lines version="32">
+                <line name="11路" actual="11"/>
+        '''
+        lines = root.xpath('/lines/line')
+
+        for line in lines:
+            name = line.xpath('@name')[0]
+            actual = ""
+            if line_type == self.constantsUtil.LINE_TYPE_PX:
+                actual = line.xpath('@actual')[0]
+
+            self.dbMandger.insertLine(line_version, line_type, name, actual)
