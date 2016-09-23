@@ -34,5 +34,13 @@ select * from t_line_version where line_type = 2 order by id desc limit 1;
 create table t_line(
 	id int not null primary key auto_increment comment '无关逻辑的主键',
     line_version int not null comment '线路版本',
-)
+    line_type int not null comment '线路类型px_line=1,pd_line=2',
+    line_name varchar(20) not null comment '线路名称',
+    line_actual varchar(20) not null comment '线路actual',
+    line_time int not null comment '线路记录的时间'
+);
+
+insert into t_line(line_version,line_type,line_name,line_actual,line_time) values(31,2,'5路','5路',147000001);
+
+-- 线路基本信息表
 

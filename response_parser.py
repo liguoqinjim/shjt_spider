@@ -7,9 +7,10 @@ from constant_manager import ConstantsManager
 
 
 class ResponseParser(object):
-    def __init__(self):
+    def __init__(self, constant):
         self.dbMandger = DBManager()
-        self.constantsUtil = ConstantsManager()
+        # self.constantsUtil = ConstantsManager()
+        self.constantsUtil = constant
 
     # 解析当前版本号
     def parseVersion(self, url):
@@ -67,6 +68,19 @@ class ResponseParser(object):
         pd_line_url = root.xpath('/modify/pd_line/@url')[0]
         px_line_url = root.xpath('/modify/px_line/@url')[0]
 
+        
+
+
+
+
+
+
+
+
+
+
+
+
         # 浦西
         current_px_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PX)
         self.constantsUtil.px_line_version = px_line_version
@@ -85,6 +99,7 @@ class ResponseParser(object):
         # 浦东
         current_pd_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PD)
         self.constantsUtil.pd_line_version = current_pd_version
+        print 'version2=' + str(self.constantsUtil.pd_line_version)
         if current_pd_version != pd_line_version:
             print '浦东线路更新'
             print pd_line_url

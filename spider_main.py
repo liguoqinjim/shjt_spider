@@ -8,8 +8,9 @@ class SpiderMain(object):
         self.url_version = 'http://www.jt.sh.cn/trafficWeb/lbs/shjtmap.xml'
         self.url_modify = 'http://www.jt.sh.cn/trafficWeb/lbs/modify.xml'
 
-        self.parser = response_parser.ResponseParser()
         self.constants = constant_manager.ConstantsManager()
+        self.parser = response_parser.ResponseParser(self.constants)
+
 
 
 if __name__ == '__main__':
@@ -19,8 +20,11 @@ if __name__ == '__main__':
     app_version = spiderMain.parser.parseVersion(spiderMain.url_version)
     spiderMain.constants.app_version = app_version
 
+    print 'version=' + str(spiderMain.constants.pd_line_version)
     # app_modify
     spiderMain.parser.parserModify(spiderMain.url_modify)
 
-    # test_line
-    # spiderMain.parser.parseLine(21, 1, 'http://www.jt.sh.cn/trafficWeb/lbs/px.xml')
+    #
+    print 'version3=' + str(spiderMain.constants.pd_line_version)
+
+    print '完成'

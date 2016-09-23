@@ -56,3 +56,5 @@ class DBManager(object):
         result = self.db.insert(sql)
 
         return result
+
+        # 插入线路的基本信息
