@@ -40,7 +40,25 @@ create table t_line(
     line_time int not null comment '线路记录的时间'
 );
 
+select count(*) from t_line where line_type = 2;
+
 insert into t_line(line_version,line_type,line_name,line_actual,line_time) values(31,2,'5路','5路',147000001);
 
+
 -- 线路基本信息表
+create table t_line_info(
+	id int not null primary key auto_increment comment '无关逻辑的主键',
+    line_id int not null,
+    line_name varchar(20) not null,
+    start_stop varchar(32) not null,
+    start_earlytime char(5) not null,
+    start_latetime char(5) not null,
+    end_stop varchar(32) not null,
+    end_earlytime char(5) not null,
+    end_latetime char(5) not null,
+    line_version int not null,
+    line_type int not null
+);
+
+
 

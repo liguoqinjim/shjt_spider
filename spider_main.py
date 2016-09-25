@@ -12,7 +12,6 @@ class SpiderMain(object):
         self.parser = response_parser.ResponseParser(self.constants)
 
 
-
 if __name__ == '__main__':
     spiderMain = SpiderMain()
 
@@ -20,11 +19,25 @@ if __name__ == '__main__':
     app_version = spiderMain.parser.parseVersion(spiderMain.url_version)
     spiderMain.constants.app_version = app_version
 
-    print 'version=' + str(spiderMain.constants.pd_line_version)
     # app_modify
     spiderMain.parser.parserModify(spiderMain.url_modify)
 
     #
-    print 'version3=' + str(spiderMain.constants.pd_line_version)
+    print "解析"
+    '''
+<linedetails><linedetail><end_earlytime>05:30</end_earlytime><end_latetime>22:30</end_latetime><end_stop>龙阳路地铁站</end_stop><line_id>10465</line_id><line_name>976路</line_name><start_earlytime>05:30</start_earlytime><start_latetime>22:30</start_latetime><start_stop>上浦路济阳路</start_stop></linedetail></linedetails>
+    '''
+
+    # 先只分析浦东
+    if spiderMain.constants.pd_lines == None:
+        # print spiderMain.constants.pd_line_version
+        # print spiderMain.constants.LINE_TYPE_PD
+        # print spiderMain.constants.pd_line_url
+        spiderMain.parser.parseLine(spiderMain.constants.pd_line_version, spiderMain.constants.LINE_TYPE_PD,
+                                    spiderMain.constants.pd_line_url, False)
+
+    print len(spiderMain.constants.pd_lines)
+    spiderMain.parser.parseLineInfo(spiderMain.constants.pd_line_version, spiderMain.constants.LINE_TYPE_PD,
+                                    spiderMain.constants.pd_get_line_info_by_name_url, False)
 
     print '完成'

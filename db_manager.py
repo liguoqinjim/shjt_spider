@@ -58,3 +58,12 @@ class DBManager(object):
         return result
 
         # 插入线路的基本信息
+
+    def insertLineInfo(self, line_id, line_name, start_stop, start_earlytime, start_latetime, end_stop, end_earlytime,
+                       end_latetime, line_version, line_type):
+        sql = "insert into t_line_info(line_id,line_name,start_stop,start_earlytime,start_latetime,end_stop,end_earlytime,end_latetime,line_version,line_type) values(%d,'%s','%s','%s','%s','%s','%s','%s',%d,%d)" % (
+            line_id, line_name, start_stop, start_earlytime, start_latetime, end_stop, end_earlytime,
+            end_latetime, line_version, line_type)
+
+        result = self.db.insert(sql)
+        return result

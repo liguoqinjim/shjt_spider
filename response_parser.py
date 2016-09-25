@@ -2,6 +2,11 @@
 import requests
 from lxml import etree
 
+import sys;
+
+reload(sys);
+sys.setdefaultencoding("utf8")
+
 from db_manager import DBManager
 from constant_manager import ConstantsManager
 
@@ -65,21 +70,15 @@ class ResponseParser(object):
 
         pd_line_version = int(str(root.xpath('/modify/pd_line/@version')[0]))
         px_line_version = int(str(root.xpath('/modify/px_line/@version')[0]))
-        pd_line_url = root.xpath('/modify/pd_line/@url')[0]
-        px_line_url = root.xpath('/modify/px_line/@url')[0]
+        pd_line_url = str(root.xpath('/modify/pd_line/@url')[0])
+        px_line_url = str(root.xpath('/modify/px_line/@url')[0])
+        self.constantsUtil.pd_line_url = pd_line_url
+        self.constantsUtil.px_line_url = px_line_url
 
-        
-
-
-
-
-
-
-
-
-
-
-
+        pd_get_line_info_by_name_url = str(root.xpath('/modify/pd_get_line_info_by_name/@url')[0])
+        px_get_line_info_by_name_url = str(root.xpath('/modify/px_get_line_info_by_name/@url')[0])
+        self.constantsUtil.pd_get_line_info_by_name_url = pd_get_line_info_by_name_url
+        self.constantsUtil.px_get_line_info_by_name_url = px_get_line_info_by_name_url
 
         # 浦西
         current_px_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PX)
@@ -92,7 +91,7 @@ class ResponseParser(object):
             self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PX, px_line_version)
 
             # 插入新的路线
-            self.parseLine(px_line_version, self.constantsUtil.LINE_TYPE_PX, px_line_url)
+            self.parseLine(px_line_version, self.constantsUtil.LINE_TYPE_PX, px_line_url, True)
 
             print '浦西线路更新完成'
 
@@ -108,10 +107,10 @@ class ResponseParser(object):
             self.dbMandger.insertLineVersion(self.constantsUtil.LINE_TYPE_PD, pd_line_version)
 
             # 插入新的线路
-            self.parseLine(pd_line_version, self.constantsUtil.LINE_TYPE_PD, pd_line_url)
+            self.parseLine(pd_line_version, self.constantsUtil.LINE_TYPE_PD, pd_line_url, True)
             print '浦东线路更新完成'
 
-    def parseLine(self, line_version, line_type, url):
+    def parseLine(self, line_version, line_type, url, whether_db):
         response = requests.get(url).content
 
         root = etree.XML(response)
@@ -122,10 +121,75 @@ class ResponseParser(object):
         '''
         lines = root.xpath('/lines/line')
 
+        if line_type == self.constantsUtil.LINE_TYPE_PX:
+            self.constantsUtil.px_lines = lines
+
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            self.constantsUtil.pd_lines = lines
+
         for line in lines:
             name = line.xpath('@name')[0]
             actual = ""
             if line_type == self.constantsUtil.LINE_TYPE_PX:
                 actual = line.xpath('@actual')[0]
 
-            self.dbMandger.insertLine(line_version, line_type, name, actual)
+            if whether_db:
+                self.dbMandger.insertLine(line_version, line_type, name, actual)
+
+    def parseLineInfo(self, line_version, line_type, url, whether_db):
+        lines = None
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            lines = self.constantsUtil.pd_lines
+        else:
+            lines = self.constantsUtil.px_lines
+
+        for line in lines:
+            name = line.xpath('@name')[0]
+            actual = ""
+            if line_type == self.constantsUtil.LINE_TYPE_PX:
+                actual = line.xpath('@actual')[0]
+
+            # 浦东
+            if line_type == self.constantsUtil.LINE_TYPE_PD:
+                final_url = url + '?linename=' + name
+                # print final_url
+
+                response = requests.get(final_url).content
+
+                # print response
+                '''<linedetails><linedetail><end_earlytime>05:30</end_earlytime><end_latetime>23:00</end_latetime><end_stop>齐河路云莲路</end_stop><line_id>10103</line_id><line_name>119路</line_name><start_earlytime>05:00</start_earlytime><start_latetime>23:00</start_latetime><start_stop>泰东路渡口</start_stop></linedetail></linedetails>'''
+
+                root = etree.XML(response)
+                line_list = root.xpath("/linedetails/linedetail/line_id/text()")
+                line_id = 0
+                line_name = ""
+                start_stop = ""
+                start_earlytime = ""
+                start_latetime = ""
+                end_stop = ""
+                end_earlytime = ""
+                end_latetime = ""
+                if len(line_list) > 0:
+                    line_id = int(str(line_list[0]))
+                    line_name = str(root.xpath("/linedetails/linedetail/line_name/text()")[0])
+                    # print line_name
+                    start_stop = str(root.xpath("/linedetails/linedetail/start_stop/text()")[0])
+                    start_earlytime = str(root.xpath("/linedetails/linedetail/start_earlytime/text()")[0])
+                    start_latetime = str(root.xpath("/linedetails/linedetail/start_latetime/text()")[0])
+                    # print start_stop + "|" + start_earlytime + "|" + start_latetime
+                    end_stop = str(root.xpath("/linedetails/linedetail/end_stop/text()")[0])
+                    end_earlytime = str(root.xpath("/linedetails/linedetail/end_earlytime/text()")[0])
+                    end_latetime = str(root.xpath("/linedetails/linedetail/end_latetime/text()")[0])
+                    # print end_stop + "|" + end_earlytime + "|" + end_latetime
+
+                # print "line_id="
+                # print line_id
+                # if line_id == 0:
+
+
+
+                if line_id != 0:
+                    if whether_db == True:
+                        print '插入数据库'
+                        self.dbMandger.insertLineInfo(line_id, line_name, start_stop, start_earlytime, start_latetime,
+                                                      end_stop, end_earlytime, end_latetime, line_version, line_type)

@@ -12,8 +12,10 @@ class ConstantsManager(object):
 
         self.px_lines = None
         self.pd_lines = None
-        self.pd_get_line_info_by_name = ""
-        self.px_get_line_info_by_name = ""
+        self.pd_line_url = ""
+        self.px_line_url = ""
+        self.pd_get_line_info_by_name_url = ""
+        self.px_get_line_info_by_name_url = ""
         self.pd_get_line = ""
         self.px_get_line = ""
         self.pd_car_monitor = ""
