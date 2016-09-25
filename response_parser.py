@@ -80,6 +80,11 @@ class ResponseParser(object):
         self.constantsUtil.pd_get_line_info_by_name_url = pd_get_line_info_by_name_url
         self.constantsUtil.px_get_line_info_by_name_url = px_get_line_info_by_name_url
 
+        pd_get_line_url = str(root.xpath('/modify/pd_get_line/@url')[0])
+        px_get_line_url = str(root.xpath('/modify/px_get_line/@url')[0])
+        self.constantsUtil.pd_get_line_url = pd_get_line_url
+        self.constantsUtil.px_get_line_url = px_get_line_url
+
         # 浦西
         current_px_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PX)
         self.constantsUtil.px_line_version = px_line_version
@@ -193,3 +198,80 @@ class ResponseParser(object):
                         print '插入数据库'
                         self.dbMandger.insertLineInfo(line_id, line_name, start_stop, start_earlytime, start_latetime,
                                                       end_stop, end_earlytime, end_latetime, line_version, line_type)
+
+    def parseLineInfoId(self, line_type, line_name):
+        url = ''
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            url = self.constantsUtil.pd_get_line_info_by_name_url
+        else:
+            url = self.constantsUtil.px_get_line_info_by_name_url
+
+        final_url = ''
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            final_url = url + '?linename=' + line_name
+        else:
+            print '浦西'
+
+        response = requests.get(final_url).content
+        root = etree.XML(response)
+        line_list = root.xpath("/linedetails/linedetail/line_id/text()")
+        line_id = 0
+        if len(line_list) > 0:
+            line_id = int(str(line_list[0]))
+
+        return line_id
+
+    def parseLineStop(self, line_version, line_type, line_id):
+        url = ""
+        final_url = ""
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            url = self.constantsUtil.pd_get_line_url
+            final_url = url + "?lineid=" + str(line_id)
+        else:
+            url = self.constantsUtil.px_get_line_url
+
+        response = requests.get(final_url).content
+        print response
+        root = etree.XML(response)
+
+        result0s = root.xpath('/lineInfoDetails/lineResults0/stop')
+        # print result0s
+
+        for result0 in result0s:
+            stop_name = str(result0.xpath("zdmc/text()")[0])
+            stop_id = int(str(result0.xpath("id/text()")[0]))
+            print 'stop_name=' + stop_name + ' | stop_id=' + str(stop_id)
+
+
+
+    def parseLineStops(self, line_version, line_type):
+        lines = None
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            lines = self.constantsUtil.pd_lines
+        else:
+            lines = self.constantsUtil.px_lines
+
+        n = 0
+        for line in lines:
+            name = line.xpath('@name')[0]
+
+            # 浦东
+
+            if line_type == self.constantsUtil.LINE_TYPE_PD:
+                line_id = self.parseLineInfoId(line_type, name)
+                print '解析' + str(line_id)
+                if line_id != 0:
+                    self.parseLineStop(line_version, line_type, line_id)
+
+
+
+
+
+
+
+
+
+                print n
+                if n > 1:
+                    break
+                n = n + 1

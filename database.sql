@@ -61,4 +61,14 @@ create table t_line_info(
 );
 
 
-
+-- 线路站点表
+create table t_line_stop(
+	id int not null primary key auto_increment comment '无关逻辑的主键',
+    line_id int not null comment '线路id',
+    stop_num int not null comment '第几站',
+    stop_direction int not null comment '站点上下行',
+    stop_name varchar(32) not null comment '站点名字',
+    stop_id int not null comment '站点id',
+    line_version int not null,
+    line_type int not null
+);

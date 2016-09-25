@@ -30,14 +30,15 @@ if __name__ == '__main__':
 
     # 先只分析浦东
     if spiderMain.constants.pd_lines == None:
-        # print spiderMain.constants.pd_line_version
-        # print spiderMain.constants.LINE_TYPE_PD
-        # print spiderMain.constants.pd_line_url
+        # 分析线路信息
         spiderMain.parser.parseLine(spiderMain.constants.pd_line_version, spiderMain.constants.LINE_TYPE_PD,
                                     spiderMain.constants.pd_line_url, False)
 
-    print len(spiderMain.constants.pd_lines)
-    spiderMain.parser.parseLineInfo(spiderMain.constants.pd_line_version, spiderMain.constants.LINE_TYPE_PD,
-                                    spiderMain.constants.pd_get_line_info_by_name_url, False)
+        # 分析线路站点
+        spiderMain.parser.parseLineStops(spiderMain.constants.pd_line_version, spiderMain.constants.LINE_TYPE_PD)
+
+    # print len(spiderMain.constants.pd_lines)
+    # spiderMain.parser.parseLineInfo(spiderMain.constants.pd_line_version, spiderMain.constants.LINE_TYPE_PD,
+    #                                 spiderMain.constants.pd_get_line_info_by_name_url, False)
 
     print '完成'
