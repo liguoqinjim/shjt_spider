@@ -231,17 +231,30 @@ class ResponseParser(object):
             url = self.constantsUtil.px_get_line_url
 
         response = requests.get(final_url).content
-        print response
+        # print response
         root = etree.XML(response)
 
         result0s = root.xpath('/lineInfoDetails/lineResults0/stop')
+        result1s = root.xpath('/lineInfoDetails/lineResults1/stop')
+
         # print result0s
 
+        stop_num1 = 1
         for result0 in result0s:
             stop_name = str(result0.xpath("zdmc/text()")[0])
             stop_id = int(str(result0.xpath("id/text()")[0]))
-            print 'stop_name=' + stop_name + ' | stop_id=' + str(stop_id)
+            # print 'stop_name=' + stop_name + ' | stop_id=' + str(stop_id)
+            # result0的stop_direction填1
+            self.dbMandger.insertLineStop(line_id, stop_num1, 1, stop_name, stop_id, line_version, line_type)
+            stop_num1 += 1
 
+        stop_num2 = 1
+        for result1 in result1s:
+            stop_name = str(result1.xpath("zdmc/text()")[0])
+            stop_id = int(str(result1.xpath("id/text()")[0]))
+            # result1的stop_direction填2
+            self.dbMandger.insertLineStop(line_id, stop_num2, 2, stop_name, stop_id, line_version, line_type)
+            stop_num2 += 1
 
 
     def parseLineStops(self, line_version, line_type):
@@ -262,14 +275,6 @@ class ResponseParser(object):
                 print '解析' + str(line_id)
                 if line_id != 0:
                     self.parseLineStop(line_version, line_type, line_id)
-
-
-
-
-
-
-
-
 
                 print n
                 if n > 1:
