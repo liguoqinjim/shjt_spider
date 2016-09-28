@@ -78,11 +78,12 @@ create table t_line_stop(
 
 
 -- 线路时刻
+drop table t_line_time;
 CREATE TABLE t_line_time (
     id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '无关逻辑的主键',
     line_id INT NOT NULL COMMENT '线路id',
-    stop_id INT NOT NULL COMMENT '在哪一站得到的时间',
-    stop_dircetion int not null comment '上下行'
+    stop_id varchar(12) NOT NULL COMMENT '在哪一站得到的时间',
+    stop_direction INT NOT NULL COMMENT '上下行',
     log_time INT NOT NULL COMMENT '得到信息的时间,这个时间点这个stop_id最多会有三条记录',
     car_info VARCHAR(16) NOT NULL COMMENT '车牌信息',
     stop_dis INT NOT NULL COMMENT '可能是还有多少站',
@@ -90,4 +91,6 @@ CREATE TABLE t_line_time (
     away_time INT NOT NULL COMMENT '还有多久到达'
 );
 
-insert into t_line_time(line_id,stop_id
+select * from t_line_time;
+
+insert into t_line_time(line_id,stop_id,stop_direction,log_time,car_info,stop_dis,distance,away_time) values(10407,1333333,1,14700001,'沪B-23432',1,2,3);
