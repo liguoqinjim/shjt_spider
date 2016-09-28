@@ -68,7 +68,7 @@ create table t_line_stop(
     stop_num int not null comment '第几站',
     stop_direction int not null comment '站点上下行',
     stop_name varchar(32) not null comment '站点名字',
-    stop_id int not null comment '站点id',
+    stop_id varchar(12) not null comment '站点id,用varchar来存，int会超出范围',
     line_version int not null,
     line_type int not null
 );

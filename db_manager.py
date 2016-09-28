@@ -67,8 +67,9 @@ class DBManager(object):
         result = self.db.insert(sql)
         return result
 
+    # 插入站点信息
     def insertLineStop(self, line_id, stop_num, stop_direction, stop_name, stop_id, line_version, line_type):
-        sql = "insert into t_line_stop(line_id,stop_num,stop_direction,stop_name,stop_id,line_version,line_type) values(%d,%d,%d,'%s',%d,%d,%d)" % (
+        sql = "insert into t_line_stop(line_id,stop_num,stop_direction,stop_name,stop_id,line_version,line_type) values(%d,%d,%d,'%s','%s',%d,%d)" % (
             line_id, stop_num, stop_direction, stop_name, stop_id, line_version, line_type)
 
         result = self.db.insert(sql)

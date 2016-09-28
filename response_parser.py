@@ -272,11 +272,9 @@ class ResponseParser(object):
 
             if line_type == self.constantsUtil.LINE_TYPE_PD:
                 line_id = self.parseLineInfoId(line_type, name)
-                print '解析' + str(line_id)
+                print '解析线路' + str(line_id)
                 if line_id != 0:
                     self.parseLineStop(line_version, line_type, line_id)
 
-                print n
-                if n > 1:
-                    break
-                n = n + 1
+                n += 1
+                print '解析完成度=' + str(n) + "/" + str(len(lines))
