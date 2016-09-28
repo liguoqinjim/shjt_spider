@@ -2,6 +2,7 @@
 import response_parser
 import constant_manager
 import db_manager
+import utils
 import threading
 import time
 
@@ -11,6 +12,7 @@ class SpiderMain(object):
         self.url_version = 'http://www.jt.sh.cn/trafficWeb/lbs/shjtmap.xml'
         self.url_modify = 'http://www.jt.sh.cn/trafficWeb/lbs/modify.xml'
 
+        self.utils = utils.UtilsManager()
         self.constants = constant_manager.ConstantsManager()
         self.db = db_manager.DBManager()
         self.parser = response_parser.ResponseParser(self.constants, self.db)
@@ -45,30 +47,51 @@ if __name__ == '__main__':
     for r in resultLine:
         if myLineName in str(r["line_name"]):  # 查询到
             resultLineInfo = spiderMain.db.getLineInfo(r["line_name"])
+
+            #判断是不是在运营时间里面
+            # operating = spiderMain.utils.checkWhetherOperating(resultLineInfo,1)
+            # operating = spiderMain.utils.checkWhetherOperating(resultLineInfo, 2)
+
             line_id = int(resultLineInfo["line_id"])
 
             stop1 = spiderMain.db.getLineStops(line_id, 1)
             stop2 = spiderMain.db.getLineStops(line_id, 2)
 
+
             n = 0
             while True:
-                for stop in stop1:
-                    stop_id = str(stop["stop_id"])
-                    line_id = int(str(stop["line_id"]))
-                    spiderMain.parser.parseLineTime(line_id, stop_id, 1, spiderMain.constants.LINE_TYPE_PD)
-                    n += 1
-                    if n % 10 == 0:
-                        print '现在已经收集' + str(n) + "条记录"
-                    time.sleep(5)
 
-                for stop in stop2:
-                    stop_id = str(stop["stop_id"])
-                    line_id = int(str(stop["line_id"]))
-                    spiderMain.parser.parseLineTime(line_id, stop_id, 2, spiderMain.constants.LINE_TYPE_PD)
-                    n += 1
-                    if n % 10 == 0:
-                        print '现在已经收集' + str(n) + "条记录"
-                    time.sleep(5)
+                #判断stop_direction==1的是否在运营时间内
+                operating = spiderMain.utils.checkWhetherOperating(resultLineInfo, 1)
+                if operating:
+                    for stop in stop1:
+                        stop_id = str(stop["stop_id"])
+                        line_id = int(str(stop["line_id"]))
+                        spiderMain.parser.parseLineTime(line_id, stop_id, 1, spiderMain.constants.LINE_TYPE_PD)
+                        n += 1
+                        if n % 10 == 0:
+                            print '现在已经收集' + str(n) + "条记录"
+                        time.sleep(5)
+                else:
+                    time.sleep(3600)
+                    print '不在运营时间内'
+
+                #判断stop_direction==2的是否在运营时间内
+                operating = spiderMain.utils.checkWhetherOperating(resultLineInfo, 2)
+                if operating:
+                    for stop in stop2:
+                        stop_id = str(stop["stop_id"])
+                        line_id = int(str(stop["line_id"]))
+                        spiderMain.parser.parseLineTime(line_id, stop_id, 2, spiderMain.constants.LINE_TYPE_PD)
+                        n += 1
+                        if n % 10 == 0:
+                            print '现在已经收集' + str(n) + "条记录"
+                        time.sleep(5)
+                else:
+                    time.sleep(3600)
+                    print '不在运营时间内'
+
+
 
 
     # spiderMain.parser.parseLineTime(10407, 1837039618, 1, spiderMain.constants.LINE_TYPE_PD)

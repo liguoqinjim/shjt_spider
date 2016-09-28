@@ -290,9 +290,10 @@ class ResponseParser(object):
         final_url = ""
         if line_type == self.constantsUtil.LINE_TYPE_PD:
             url = self.constantsUtil.pd_car_monitor_url
-            final_url = url + "?lineid=" + str(line_id) + "&stopid=" + str(stop_id) + "&direction=" + str(stop_direction)
+            final_url = url + "?lineid=" + str(line_id) + "&stopid=" + str(stop_id) + "&direction=" + str(
+                stop_direction)
         else:
-            #浦西暂时不做
+            # 浦西暂时不做
             url = self.constantsUtil.px_car_monitor_url
 
         log_time = time.time()
@@ -309,13 +310,10 @@ class ResponseParser(object):
             stopdis = int(str(car.xpath("stopdis/text()")[0]))
             distance = int(str(car.xpath("distance/text()")[0]))
             away_time = str(car.xpath("time/text()")[0])
-            if '分钟' in away_time:#可以会出现25分钟以上，这种选项
+            if '分钟' in away_time:  # 可以会出现25分钟以上，这种选项
                 away_time = 99999
             else:
                 away_time = int(away_time)
 
-            self.dbMandger.insertLineTime(line_id, stop_id, stop_direction, log_time, terminal, stopdis, distance, away_time)
-
-
-
-
+            self.dbMandger.insertLineTime(line_id, stop_id, stop_direction, log_time, terminal, stopdis, distance,
+                                          away_time)
