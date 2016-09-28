@@ -42,6 +42,9 @@ create table t_line(
 
 select count(*) from t_line where line_type = 2;
 
+#通过线路名字查询
+select * from t_line where line_name like '871%';
+
 insert into t_line(line_version,line_type,line_name,line_actual,line_time) values(31,2,'5路','5路',147000001);
 
 
@@ -72,3 +75,19 @@ create table t_line_stop(
     line_version int not null,
     line_type int not null
 );
+
+
+-- 线路时刻
+CREATE TABLE t_line_time (
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '无关逻辑的主键',
+    line_id INT NOT NULL COMMENT '线路id',
+    stop_id INT NOT NULL COMMENT '在哪一站得到的时间',
+    stop_dircetion int not null comment '上下行'
+    log_time INT NOT NULL COMMENT '得到信息的时间,这个时间点这个stop_id最多会有三条记录',
+    car_info VARCHAR(16) NOT NULL COMMENT '车牌信息',
+    stop_dis INT NOT NULL COMMENT '可能是还有多少站',
+    distance INT NOT NULL COMMENT '可能是距离',
+    away_time INT NOT NULL COMMENT '还有多久到达'
+);
+
+insert into t_line_time(line_id,stop_id

@@ -1,5 +1,6 @@
 # coding:utf8
 import requests
+import time
 from lxml import etree
 
 import sys;
@@ -12,8 +13,8 @@ from constant_manager import ConstantsManager
 
 
 class ResponseParser(object):
-    def __init__(self, constant):
-        self.dbMandger = DBManager()
+    def __init__(self, constant, db):
+        self.dbMandger = db
         # self.constantsUtil = ConstantsManager()
         self.constantsUtil = constant
 
@@ -84,6 +85,11 @@ class ResponseParser(object):
         px_get_line_url = str(root.xpath('/modify/px_get_line/@url')[0])
         self.constantsUtil.pd_get_line_url = pd_get_line_url
         self.constantsUtil.px_get_line_url = px_get_line_url
+
+        pd_car_monitor_url = str(root.xpath('/modify/pd_car_monitor/@url')[0])
+        px_car_monitor_url = str(root.xpath('/modify/px_car_monitor/@url')[0])
+        self.constantsUtil.pd_car_monitor_url = pd_car_monitor_url
+        self.constantsUtil.px_car_monitor_url = px_car_monitor_url
 
         # 浦西
         current_px_version = self.dbMandger.getCurrentLineVersion(self.constantsUtil.LINE_TYPE_PX)
@@ -256,7 +262,6 @@ class ResponseParser(object):
             self.dbMandger.insertLineStop(line_id, stop_num2, 2, stop_name, stop_id, line_version, line_type)
             stop_num2 += 1
 
-
     def parseLineStops(self, line_version, line_type):
         lines = None
         if line_type == self.constantsUtil.LINE_TYPE_PD:
@@ -278,3 +283,39 @@ class ResponseParser(object):
 
                 n += 1
                 print '解析完成度=' + str(n) + "/" + str(len(lines))
+
+    # 解析线路时刻
+    def parseLineTime(self, line_id, stop_id, stop_direction, line_type):
+        # line_type判断用哪个url
+        final_url = ""
+        if line_type == self.constantsUtil.LINE_TYPE_PD:
+            url = self.constantsUtil.pd_car_monitor_url
+            final_url = url + "?lineid=" + str(line_id) + "&stopid=" + str(stop_id) + "&direction=" + str(stop_direction)
+        else:
+            #浦西暂时不做
+            url = self.constantsUtil.px_car_monitor_url
+
+        log_time = time.time()
+        # print final_url
+        response = requests.get(final_url).content
+        root = etree.XML(response)
+
+        cars = root.xpath("/result/cars/car")
+
+        # print response
+
+        for car in cars:
+            terminal = str(car.xpath("terminal/text()")[0])
+            stopdis = int(str(car.xpath("stopdis/text()")[0]))
+            distance = int(str(car.xpath("distance/text()")[0]))
+            away_time = str(car.xpath("time/text()")[0])
+            if '分钟' in away_time:#可以会出现25分钟以上，这种选项
+                away_time = 99999
+            else:
+                away_time = int(away_time)
+
+            self.dbMandger.insertLineTime(line_id, stop_id, stop_direction, log_time, terminal, stopdis, distance, away_time)
+
+
+
+

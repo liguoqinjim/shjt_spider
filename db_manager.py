@@ -74,3 +74,34 @@ class DBManager(object):
 
         result = self.db.insert(sql)
         return result
+
+    # 查询t_line
+    def getLines(self, line_name_pattern):
+        sql = "select * from t_line where line_name like '" + line_name_pattern + "%%'"
+
+        result = self.db.query(sql)
+        return result
+
+    # 查询一条线路的line_info
+    def getLineInfo(self, line_name):
+        sql = "select * from t_line_info where line_name = %s"
+
+        result = self.db.get(sql, line_name)
+        return result
+
+    # 查看线路一个方向的所有站点
+    def getLineStops(self, line_id, stop_direction):
+        sql = "select * from t_line_stop where line_id = %d and stop_direction = %d order by stop_num" % (
+            line_id, stop_direction)
+
+        result = self.db.query(sql)
+        return result
+
+    # 插入线路时刻信息
+    def insertLineTime(self, line_id, stop_id, stop_direction, log_time, car_info, stop_dis, distance, away_time):
+        sql = "insert into t_line_time(line_id,stop_id,stop_direction,log_time,car_info,stop_dis,distance,away_time) values(%d,'%s',%d,%d,'%s',%d,%d,%d)" % (
+            line_id, stop_id, stop_direction, log_time, car_info, stop_dis, distance, away_time)
+
+        result = self.db.insert(sql)
+
+        return result
