@@ -18,7 +18,16 @@ class UtilsManager(object):
             start_time = line_info['end_earlytime']
             end_time = line_info['end_latetime']
 
+        start_time = start_time.replace(':','')
+        end_time = end_time.replace(':','')
+        start_time = int(start_time)
+        end_time = int(end_time)
+
         now_time = int(time.strftime("%H%M",time.localtime(time.time())))
+        # now_time = int(time.strftime("%H%M",time.localtime(1475114509)))
+        # print start_time
+        # print end_time
+        # print now_time
 
         if now_time < start_time:
             return False
