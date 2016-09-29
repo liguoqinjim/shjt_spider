@@ -18,6 +18,10 @@ class ResponseParser(object):
         # self.constantsUtil = ConstantsManager()
         self.constantsUtil = constant
 
+        #
+        requests.adapters.DEFAULT_RETRIES = 5
+        requests.session().keep_active = False
+
     # 解析当前版本号
     def parseVersion(self, url):
         '''
