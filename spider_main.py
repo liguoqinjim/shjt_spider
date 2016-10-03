@@ -45,9 +45,10 @@ if __name__ == '__main__':
     myLineName = '871'
     resultLine = spiderMain.db.getLines(myLineName)
     for r in resultLine:
+        print '线路解析完成'
         if myLineName in str(r["line_name"]):  # 查询到
             resultLineInfo = spiderMain.db.getLineInfo(r["line_name"])
-
+            print '线路info解析完成'
             # 判断是不是在运营时间里面
             # operating = spiderMain.utils.checkWhetherOperating(resultLineInfo,1)
             # if operating:
@@ -60,7 +61,7 @@ if __name__ == '__main__':
 
             stop1 = spiderMain.db.getLineStops(line_id, 1)
             stop2 = spiderMain.db.getLineStops(line_id, 2)
-
+            print '线路站点信息解析完成'
             n = 0
             while True:
 
@@ -76,8 +77,8 @@ if __name__ == '__main__':
                             print '现在已经收集' + str(n) + "条记录"
                         time.sleep(5)
                 else:
-                    time.sleep(3600)
                     print '不在运营时间内' + str(time.time())
+                    time.sleep(600)
 
                 # 判断stop_direction==2的是否在运营时间内
                 operating = spiderMain.utils.checkWhetherOperating(resultLineInfo, 2)
@@ -91,8 +92,8 @@ if __name__ == '__main__':
                             print '现在已经收集' + str(n) + "条记录"
                         time.sleep(5)
                 else:
-                    time.sleep(3600)
                     print '不在运营时间内' + str(time.time())
+                    time.sleep(600)
 
     # spiderMain.parser.parseLineTime(10407, 1837039618, 1, spiderMain.constants.LINE_TYPE_PD)
 
