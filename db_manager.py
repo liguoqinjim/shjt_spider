@@ -102,6 +102,18 @@ class DBManager(object):
         sql = "insert into t_line_time(line_id,stop_id,stop_direction,log_time,car_info,stop_dis,distance,away_time) values(%d,'%s',%d,%d,'%s',%d,%d,%d)" % (
             line_id, stop_id, stop_direction, log_time, car_info, stop_dis, distance, away_time)
 
-        result = self.db.insert(sql)
+        try:
+            result = self.db.insert(sql)
+            return result
+        except Exception, e:
+            print Exception, ":", e
+            self.resetDB()
 
-        return result
+    def resetDB(self):
+        self.db = torndb.Connection(
+            host='mysql.t0.daoapp.io:61499',
+            database='shjt_spider',
+            user='root',
+            password='xphone123',
+            charset='utf8'
+        )

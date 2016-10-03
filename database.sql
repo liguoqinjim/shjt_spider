@@ -63,6 +63,8 @@ create table t_line_info(
     line_type int not null
 );
 
+select * from t_line_info where line_id = 10407;
+
 
 -- 线路站点表
 create table t_line_stop(
@@ -75,6 +77,8 @@ create table t_line_stop(
     line_version int not null,
     line_type int not null
 );
+
+select * from t_line_stop where line_id = 10407;
 
 
 -- 线路时刻
@@ -92,5 +96,6 @@ CREATE TABLE t_line_time (
 );
 
 select * from t_line_time;
+select count(id) from t_line_time;
 
 insert into t_line_time(line_id,stop_id,stop_direction,log_time,car_info,stop_dis,distance,away_time) values(10407,1333333,1,14700001,'沪B-23432',1,2,3);

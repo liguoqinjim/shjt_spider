@@ -302,7 +302,20 @@ class ResponseParser(object):
 
         log_time = time.time()
         # print final_url
-        response = requests.get(final_url).content
+        # response = requests.get(final_url).content
+        response = ""
+        try:
+            r = requests.get(final_url)
+            # 测试关闭连接
+            r.connection.close()
+            # r = requests.post(url=url, data=body, headers={'Connection': 'close'})
+            response = r.content
+        except Exception, e:
+            print Exception, ":", e
+            return
+
+        # print '关闭连接'
+
         root = etree.XML(response)
 
         cars = root.xpath("/result/cars/car")

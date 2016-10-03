@@ -67,6 +67,7 @@ if __name__ == '__main__':
 
                 # 判断stop_direction==1的是否在运营时间内
                 operating = spiderMain.utils.checkWhetherOperating(resultLineInfo, 1)
+                # operating = True
                 if operating:
                     for stop in stop1:
                         stop_id = str(stop["stop_id"])
